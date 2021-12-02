@@ -2,12 +2,11 @@ const db = require('../../data/db-config');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const colors = require('colors');
+const { contentSecurityPolicy } = require('helmet');
 
 function trimPassword(user) {
-  // returns a copy of the user with the password trimmed
-  const trimmedUser = { ...user };
-  delete trimmedUser.password;
-  return trimmedUser;
+  if (user.password) { delete user.password; }
+  return user;
 }
 
 async function add(user) {
@@ -24,10 +23,10 @@ async function add(user) {
 async function login(user) {
   // compares password hash with password entered, returns new user and json web token if successful
   try {
-    const foundUser = await findBy({ username: user.username });
+    let foundUser = await findBy({ filter: 'username', value: user.username });
     if (foundUser && bcrypt.compareSync(user.password, foundUser.password)) {
       const token = jwt.sign({ id: foundUser.user_id }, process.env.SESSION_SECRET, { expiresIn: '1h' });
-      trimPassword(foundUser);
+      // foundUser = trimPassword(foundUser);
       return {
         ...foundUser,
         token,
@@ -43,27 +42,33 @@ async function find() {
   // resolves to an ARRAY with all users, each user having { user_id, username }
   try {
     const users = await db('users');
-    users.map(user => trimPassword(user));
+    // users.map(user => trimPassword(user));
     return users;
   } catch (error) {
     return ({ error, message: "error in users-model.js -> find" });
   }
 }
 
-async function findBy(filter, value) {
-  console.log(`Finding user by ${filter}: ${value}`.cyan);
-  // resolves to an ARRAY with all users in users database that match the filter condition
-  let user = await db('users').where({ [filter]: value }).first();
-  if (user) {
-    user = trimPassword(user);
-    return user;
-  } else {
-    return null;
-  }
+async function findBy(criteria) {
+  // resolves to an ARRAY with all users matching given criteria, each user having { user_id, username }
+  console.group('*** findBy ***'.america)
+  console.table(criteria);
+  const { filter, value } = criteria;
+  const users = await db('users')
+    .where(filter, value);
+  console.log(users);
+  users.map(user => trimPassword(user));
+  console.log('--- end findBy ---'.red);
+  console.groupEnd('findBy');
+  return users;
 }
 
-async function findById(user_id) {
-  return await findBy('user_id', user_id);
+async function findById(id) {
+  console.group('*** findById ***'.america)
+  const user = await findBy({ filter: 'user_id', value: id });
+  console.log(`Found user ${user.username} with id: ${id}`.cyan);
+  console.groupEnd('findById');
+  return user[0];
 }
 
 

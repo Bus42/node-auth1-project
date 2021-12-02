@@ -3,7 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const { checkUsernameFree, checkPasswordLength } = require('../auth/auth-middleware');
-const usersDb = require('../users/users-model');
+const db = require('../users/users-model');
 
 /**
   1 [POST] /api/auth/register { "username": "sue", "password": "1234" }
@@ -29,10 +29,8 @@ const usersDb = require('../users/users-model');
  */
 
 router.post('/register', checkUsernameFree, checkPasswordLength, (req, res) => {
-  usersDb.add(req.body)
+  db.add(req.body)
     .then(user => {
-      // return user without password
-      delete user.password;
       res.status(200).send(user);
     })
     .catch(error => {
@@ -58,6 +56,11 @@ router.post('/register', checkUsernameFree, checkPasswordLength, (req, res) => {
   }
  */
 
+router.post('/login', (req, res) => {
+  db.login(req.body)
+    .then(user => res.status(200).send(user))
+})
+
 
 /**
   3 [GET] /api/auth/logout
@@ -74,6 +77,11 @@ router.post('/register', checkUsernameFree, checkPasswordLength, (req, res) => {
     "message": "no session"
   }
  */
+
+router.post('/logout', (req, res) => {
+  req.session.destroy();
+  res.status(200).send({ message: 'logged out' });
+})
 
 
 // Don't forget to add the router to the `exports` object so it can be required in other modules

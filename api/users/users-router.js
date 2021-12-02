@@ -30,7 +30,7 @@ const { restricted } = require('../auth/auth-middleware');
   }
  */
 
-router.get('/', restricted, (req, res) => {
+router.get('/', (req, res) => {
   users.find()
     .then(users => {
       users.map(user => delete user.password)
