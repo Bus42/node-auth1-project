@@ -1,5 +1,5 @@
 const express = require("express");
-// const session = require("express-session");
+const session = require("express-session");
 const helmet = require("helmet");
 const cors = require("cors");
 const usersRouter = require('./users/users-router');
@@ -32,8 +32,8 @@ server.use(middleware);
 server.use('/api/users', usersRouter);
 server.use('/api/auth', authRouter);
 
-server.use('/*', (req, res) => {
-  res.status(404).send({ message: `${req.baseUrl} is not a valid URL` });
+server.use('/', (req, res) => {
+  res.status(200).send({ message: "api up" });
 })
 
 server.use((err, req, res, next) => { // eslint-disable-line
