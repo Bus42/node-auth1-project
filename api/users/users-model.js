@@ -14,8 +14,8 @@ async function add(user) {
   user.password = hash;
   const [user_id] = await db('users').insert(user);
   console.log(colors.bgCyan.white(`Added user with id: ${user_id}`));
-  const newUser = await findById(user_id);
-  trimPassword(newUser);
+  let newUser = await findById(user_id);
+  newUser = trimPassword(newUser);
   return newUser;
 }
 
@@ -38,10 +38,9 @@ async function login(user) {
 }
 
 async function find() {
-  // resolves to an ARRAY with all users, each user having { user_id, username }
   try {
     const users = await db('users');
-    // users.map(user => trimPassword(user));
+    users.map(user => trimPassword(user));
     return users;
   } catch (error) {
     return ({ error, message: "error in users-model.js -> find" });
@@ -71,8 +70,6 @@ async function findById(id) {
   return user[0];
 }
 
-
-// Don't forget to add these to the `exports` object so they can be required in other modules
 module.exports = {
   find,
   findBy,

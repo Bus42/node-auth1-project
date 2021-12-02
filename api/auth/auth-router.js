@@ -2,7 +2,8 @@
 // middleware functions from `auth-middleware.js`. You will need them here!
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcrypt');
+const users = require('../users/users-model');
+const { checkUsernameFree, checkPasswordLength } = require('../auth/auth-middleware');
 
 /**
   1 [POST] /api/auth/register { "username": "sue", "password": "1234" }
@@ -27,10 +28,14 @@ const bcrypt = require('bcrypt');
   }
  */
 
-router.post('/register', (req, res) => {
-  let user = req.body;
-  user.password = bcrypt.hashSync(user.password, 10);
-  res.status(200).json(user);
+router.post('/register', checkUsernameFree, checkPasswordLength, (req, res) => {
+  users.add(req.body)
+    .then(user => {
+      res.status(201).send(user);
+    })
+    .catch(error => {
+      res.status(422).json({ message: error.message });
+    });
 });
 
 
