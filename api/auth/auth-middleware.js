@@ -1,9 +1,9 @@
 const colors = require('colors');
 
 function restricted(req, res, next) {
-  if(!req.session){console.log(colors.bgYellow.black('no session'))}
+  if (!req.session) { console.log(colors.bgYellow.black('no session')) }
   else {
-    console.log('session:', req.session.user);
+    console.log(colors.bgBlue.white('session:'), req.session.user);
   }
   next();
   // if (!req.session) {
