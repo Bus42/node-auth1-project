@@ -56,8 +56,8 @@ async function findBy(criteria) {
   const { filter, value } = criteria;
   const users = await db('users')
     .where(filter, value);
-  console.log(users);
   users.map(user => trimPassword(user));
+  console.log(users);
   console.log('--- end findBy ---'.red);
   console.groupEnd('findBy');
   return users;
@@ -66,7 +66,8 @@ async function findBy(criteria) {
 async function findById(id) {
   console.group('*** findById ***'.america)
   const user = await findBy({ filter: 'user_id', value: id });
-  console.log(`Found user ${user.username} with id: ${id}`.cyan);
+  console.log(`Found user with id: ${id}`.rainbow);
+  console.log('--- end findById ---'.red);
   console.groupEnd('findById');
   return user[0];
 }

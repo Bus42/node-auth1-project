@@ -4,6 +4,7 @@ const helmet = require("helmet");
 const cors = require("cors");
 const usersRouter = require('./users/users-router');
 const authRouter = require('./auth/auth-router');
+const morgan = require("morgan");
 
 
 /**
@@ -24,6 +25,7 @@ const middleware = [
   helmet(),
   express.json(),
   cors(),
+  morgan("dev")
 ];
 
 server.use(middleware);
