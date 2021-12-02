@@ -1,5 +1,5 @@
 const colors = require('colors');
-const users = require('../users/users-model.js');
+const Users = require('../users/users-model.js');
 
 function restricted(req, res, next) {
   if (!req.session) { console.log(colors.bgYellow.black('no session')) }
@@ -15,18 +15,32 @@ function restricted(req, res, next) {
 }
 
 async function checkUsernameFree(req, res, next) {
-  const username = req.body.username;
-  const user = await users.findBy({ filter: 'username', value: username });
-  console.log(user);
-  if (!user || user.length === 0) {
-    next();
-  } else {
-    res.status(422).send({ message: 'Username taken' });
+  try {
+    const users = await Users.findBy({ username: req.body.username });
+    if (!users.length) {
+      next();
+    } else {
+      res.status(422).send({ message: 'Username taken' });
+    }
+  }
+  catch (err) {
+    next(err);
   }
 }
 
-function checkUsernameExists(req, res, next) {
-  next();
+async function checkUsernameExists(req, res, next) {
+  try {
+    const users = await Users.findBy({ username: req.body.username });
+    if (users.length) {
+      next();
+    }
+    else {
+      res.status(404).send({ message: 'Username does not exist' });
+    }
+  }
+  catch (err) {
+    next(err);
+  }
 }
 
 function checkPasswordLength(req, res, next) {
