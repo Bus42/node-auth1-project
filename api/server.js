@@ -39,8 +39,8 @@ const middleware = [
     secret: process.env.JWT_SECRET, // even more secret secret
     cookie: {
       maxAge: 1 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
     },
-    httpOnly: false,
     resave: false,
     saveUninitialized: process.env.NODE_ENV === 'development',// don't prompt for session cookie if in development mode
     store,
