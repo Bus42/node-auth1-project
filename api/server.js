@@ -1,20 +1,10 @@
 const express = require("express");
+// const session = require("express-session");
 const helmet = require("helmet");
 const cors = require("cors");
 const usersRouter = require('./users/users-router');
 const authRouter = require('./auth/auth-router');
-const session = require('express-session');
-const KnexSessionStore = require('connect-session-knex')(session);
-const db = require('../data/db-config');
 
-const store = new KnexSessionStore({
-  tablename: 'sessions',
-  sidfieldname: 'sid',
-  knex: db,
-  createtable: true,
-  clearInterval: 60000,
-  disableDbCleanup: false,
-});
 
 /**
   Do what needs to be done to support sessions with the `express-session` package!
@@ -34,17 +24,6 @@ const middleware = [
   helmet(),
   express.json(),
   cors(),
-  session({
-    name: 'test session',
-    secret: process.env.JWT_SECRET, // even more secret secret
-    cookie: {
-      maxAge: 1 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-    },
-    resave: false,
-    saveUninitialized: process.env.NODE_ENV === 'development',// don't prompt for session cookie if in development mode
-    store,
-  })
 ];
 
 server.use(middleware);

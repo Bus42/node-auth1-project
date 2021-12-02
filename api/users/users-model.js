@@ -26,7 +26,7 @@ async function login(user) {
   try {
     const foundUser = await findBy({ username: user.username });
     if (foundUser && bcrypt.compareSync(user.password, foundUser.password)) {
-      const token = jwt.sign({ id: foundUser.user_id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      const token = jwt.sign({ id: foundUser.user_id }, process.env.SESSION_SECRET, { expiresIn: '1h' });
       trimPassword(foundUser);
       return {
         ...foundUser,
