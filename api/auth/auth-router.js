@@ -80,7 +80,9 @@ router.post('/login', (req, res) => {
  */
 
 router.post('/logout', (req, res) => {
-  res.send({ message: 'logged out' });
+  users.logout(req.body)
+    .then(user => res.status(200).send(user))
+    .catch(error => res.status(422).json({ message: error.message }));
 })
 
 

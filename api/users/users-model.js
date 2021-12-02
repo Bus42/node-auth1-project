@@ -3,19 +3,12 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const colors = require('colors');
 
-function trimPassword(user) {
-  if (user.password) { delete user.password; }
-  return user;
-}
-
 async function add(user) {
   // stores password hash, returns user
   const hash = bcrypt.hashSync(user.password, 10);
-  user.password = hash;
-  const [user_id] = await db('users').insert(user);
+  const [user_id] = await db('users').insert({ ...user, password: hash });
   console.log(colors.bgCyan.white(`Added user with id: ${user_id}`));
   let newUser = await findById(user_id);
-  newUser = trimPassword(newUser);
   return newUser;
 }
 
@@ -39,8 +32,7 @@ async function login(user) {
 
 async function find() {
   try {
-    const users = await db('users');
-    users.map(user => trimPassword(user));
+    const users = await db('users').select('user_id', 'username');
     return users;
   } catch (error) {
     return ({ error, message: "error in users-model.js -> find" });
@@ -49,15 +41,8 @@ async function find() {
 
 async function findBy(criteria) {
   // resolves to an ARRAY with all users matching given criteria, each user having { user_id, username }
-  console.group(colors.america('*** findBy ***'))
-  console.table(criteria);
-  const { filter, value } = criteria;
   const users = await db('users')
-    .where(filter, value);
-  users.map(user => trimPassword(user));
-  console.log(users);
-  console.log(colors.red('--- end findBy ---'));
-  console.groupEnd('findBy');
+    .where(criteria.filter, criteria.value).select('user_id', 'username');
   return users;
 }
 
@@ -70,10 +55,15 @@ async function findById(id) {
   return user[0];
 }
 
+async function logout(user) {
+  return `${user.username} has logged out`;
+}
+
 module.exports = {
   find,
   findBy,
   findById,
   add,
-  login
+  login,
+  logout,
 };
