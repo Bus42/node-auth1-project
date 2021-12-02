@@ -20,7 +20,7 @@ async function checkUsernameFree(req, res, next) {
     if (!users.length) {
       next();
     } else {
-      res.status(422).send({ message: 'Username taken' });
+      next({ message: 'Username taken', status: 422 });
     }
   }
   catch (err) {
@@ -35,7 +35,7 @@ async function checkUsernameExists(req, res, next) {
       next();
     }
     else {
-      res.status(404).send({ message: 'Username does not exist' });
+      next({ message: 'Username does not exist', status: 404 });
     }
   }
   catch (err) {
@@ -46,7 +46,7 @@ async function checkUsernameExists(req, res, next) {
 function checkPasswordLength(req, res, next) {
   const password = req.body.password;
   if (!password || password.length < 3) {
-    res.status(422).send({ message: 'Password must be longer than 3 chars' });
+    next({ message: 'Password must be longer than 3 chars', status: 422 });
   } else {
     next();
   }
