@@ -1,7 +1,6 @@
 const db = require('../../data/db-config');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-// eslint-disable-next-line no-unused-vars
 const colors = require('colors');
 
 function trimPassword(user) {
@@ -14,7 +13,7 @@ async function add(user) {
   const hash = bcrypt.hashSync(user.password, 10);
   user.password = hash;
   const [user_id] = await db('users').insert(user);
-  console.log(`Added user with id: ${user_id}`.cyan);
+  console.log(colors.bgCyan.white(`Added user with id: ${user_id}`));
   const newUser = await findById(user_id);
   trimPassword(newUser);
   return newUser;
@@ -51,23 +50,23 @@ async function find() {
 
 async function findBy(criteria) {
   // resolves to an ARRAY with all users matching given criteria, each user having { user_id, username }
-  console.group('*** findBy ***'.america)
+  console.group(colors.america('*** findBy ***'))
   console.table(criteria);
   const { filter, value } = criteria;
   const users = await db('users')
     .where(filter, value);
   users.map(user => trimPassword(user));
   console.log(users);
-  console.log('--- end findBy ---'.red);
+  console.log(colors.red('--- end findBy ---'));
   console.groupEnd('findBy');
   return users;
 }
 
 async function findById(id) {
-  console.group('*** findById ***'.america)
+  console.group(colors.america('*** findById ***'))
   const user = await findBy({ filter: 'user_id', value: id });
-  console.log(`Found user with id: ${id}`.rainbow);
-  console.log('--- end findById ---'.red);
+  console.log(colors.rainbow(`Found user with id: ${id}`));
+  console.log(colors.red('--- end findById ---'));
   console.groupEnd('findById');
   return user[0];
 }

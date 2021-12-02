@@ -2,8 +2,9 @@
 const users = require('./users-model');
 const router = require('express').Router();
 const { isValidID } = require('./users-middleware');
+const { restricted } = require('../auth/auth-middleware');
 
-router.get('/', (req, res) => {
+router.get('/', restricted, (req, res) => {
   users.find()
     .then(users => {
       users.map(user => delete user.password)
