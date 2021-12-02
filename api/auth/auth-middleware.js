@@ -29,10 +29,10 @@ async function checkUsernameFree(req, res, next) {
   const username = req.body.username;
   const user = await db.findBy('username', username);
   console.log(user);
-  if (user) {
-    return res.status(422).send({ message: 'Username taken' });
-  } else {
+  if (!user) {
     next();
+  } else {
+    res.status(422).send({ message: 'Username taken' });
   }
 }
 

@@ -12,16 +12,13 @@ function trimPassword(user) {
 
 async function add(user) {
   // stores password hash, returns user
-  try {
-    const hash = bcrypt.hashSync(user.password, 10);
-    user.password = hash;
-    const [user_id] = await db('users').insert(user);
-    const newUser = await findById(user_id);
-    // trimPassword(newUser);
-    return newUser;
-  } catch (error) {
-    return ({ error, message: 'Error registering user' });
-  }
+  const hash = bcrypt.hashSync(user.password, 10);
+  user.password = hash;
+  const [user_id] = await db('users').insert(user);
+  console.log(`Added user with id: ${user_id}`.cyan);
+  const newUser = await findById(user_id);
+  trimPassword(newUser);
+  return newUser;
 }
 
 async function login(user) {
@@ -56,25 +53,17 @@ async function find() {
 async function findBy(filter, value) {
   console.log(`Finding user by ${filter}: ${value}`.cyan);
   // resolves to an ARRAY with all users in users database that match the filter condition
-  try {
-    const users = await db('users').where({ [filter]: value })
-      .select('user_id', 'username')
-    console.log(users);
-    return users;
-  } catch (error) {
-    return ({ error, message: "error in users-model.js -> findBy" });
+  const user = await db('users').where({ [filter]: value }).first();
+  if (user) {
+    trimPassword(user);
+    return user;
+  } else {
+    return null;
   }
 }
 
 async function findById(user_id) {
-  // resolves to the user { user_id, username } with the given user_id
-  try {
-    const user = db('users').where({ user_id }).first() || false;
-    trimPassword(user);
-    return user;
-  } catch (error) {
-    return ({ error, message: "error in users-model.js -> findById" });
-  }
+  return await findBy('user_id', user_id);
 }
 
 
