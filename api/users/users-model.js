@@ -1,5 +1,4 @@
 const db = require('../../data/db-config');
-const bcrypt = require('bcryptjs');
 
 async function add(user) {
   const [user_id] = await db('users').insert(user);
