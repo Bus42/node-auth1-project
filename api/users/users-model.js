@@ -53,9 +53,9 @@ async function find() {
 async function findBy(filter, value) {
   console.log(`Finding user by ${filter}: ${value}`.cyan);
   // resolves to an ARRAY with all users in users database that match the filter condition
-  const user = await db('users').where({ [filter]: value }).first();
+  let user = await db('users').where({ [filter]: value }).first();
   if (user) {
-    trimPassword(user);
+    user = trimPassword(user);
     return user;
   } else {
     return null;
