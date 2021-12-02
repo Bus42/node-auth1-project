@@ -7,17 +7,7 @@ async function add(user) {
 }
 
 async function login(user) {
-  // compares password hash with password entered, returns new user and json web token if successful
-  try {
-    let foundUser = await findBy({ username: user.username });
-    if (foundUser && bcrypt.compareSync(user.password, foundUser.password)) {
-      return foundUser;
-    } else {
-      return ({ error: 'Invalid credentials' });
-    }
-  } catch (error) {
-    return ({ ...error, message: 'Error logging in user' });
-  }
+  return `${user.username} has logged in`;
 }
 
 async function find() {

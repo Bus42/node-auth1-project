@@ -35,7 +35,7 @@ async function checkUsernameExists(req, res, next) {
       next();
     }
     else {
-      next({ message: 'Username does not exist', status: 404 });
+      next({ message: 'Username does not exist', status: 401 });
     }
   }
   catch (err) {

@@ -6,7 +6,7 @@ const { checkUsernameFree, checkPasswordLength, checkUsernameExists } = require(
 router.post('/register', checkUsernameFree, checkPasswordLength, (req, res) => {
   users.add(req.body)
     .then(user => {
-      if(user){res.status(201).send(user)}
+      if (user) { res.status(201).send(user) }
     })
     .catch(error => {
       res.status(422).json({ message: error.message });
@@ -15,19 +15,7 @@ router.post('/register', checkUsernameFree, checkPasswordLength, (req, res) => {
 
 router.post('/login', checkUsernameExists, (req, res) => {
   users.login(req.body)
-    .then(user => {
-      if (!user) {
-        res.status(401).send(`User ${req.body.username} does not exist`);
-      } else {
-        console.log(user);
-        res.status(200).send(`Welcome ${user.username}!`);
-      }
-    })
-    .catch(error => {
-      res.status(401).send(error);
-    });
-  // db.login(req.body)
-  //   .then(user => res.status(200).send(user))
+    .then(response => res.status(200).send(response))
 })
 
 router.post('/logout', (req, res) => {
