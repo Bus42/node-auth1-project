@@ -1,8 +1,8 @@
 const db = require('../../data/db-config');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+// eslint-disable-next-line no-unused-vars
 const colors = require('colors');
-const { contentSecurityPolicy } = require('helmet');
 
 function trimPassword(user) {
   if (user.password) { delete user.password; }
