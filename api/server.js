@@ -1,10 +1,9 @@
 const express = require("express");
-const session = require("express-session");
 const helmet = require("helmet");
 const cors = require("cors");
+const morgan = require("morgan");
 const usersRouter = require('./users/users-router');
 const authRouter = require('./auth/auth-router');
-const morgan = require("morgan");
 
 
 /**
