@@ -1,4 +1,5 @@
 const colors = require('colors');
+const db = require('../users/users-model.js');
 /*
   If the user does not have a session saved in the server
 
@@ -24,8 +25,15 @@ function restricted(req, res, next) {
     "message": "Username taken"
   }
 */
-function checkUsernameFree(req, res, next) {
-  next();
+async function checkUsernameFree(req, res, next) {
+  const username = req.body.username;
+  const user = await db.findBy('username', username);
+  console.log(user);
+  if (user) {
+    return res.status(422).send({ message: 'Username taken' });
+  } else {
+    next();
+  }
 }
 
 /*

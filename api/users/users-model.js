@@ -1,6 +1,7 @@
 const db = require('../../data/db-config');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const colors = require('colors');
 
 function trimPassword(user) {
   // returns a copy of the user with the password trimmed
@@ -52,11 +53,13 @@ async function find() {
   }
 }
 
-function findBy(filter) {
+async function findBy(filter, value) {
+  console.log(`Finding user by ${filter}: ${value}`.cyan);
   // resolves to an ARRAY with all users in users database that match the filter condition
   try {
-    const users = db('users').where(filter);
-    users.map(user => trimPassword(user));
+    const users = await db('users').where({ [filter]: value })
+      .select('user_id', 'username')
+    console.log(users);
     return users;
   } catch (error) {
     return ({ error, message: "error in users-model.js -> findBy" });
