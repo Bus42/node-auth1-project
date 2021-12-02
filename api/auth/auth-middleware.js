@@ -8,11 +8,12 @@ const colors = require('colors');
   }
 */
 function restricted(req, res, next) {
-  console.log(req.session || "no session").info;
+  console.log(req.session || "no session".warn);
   if (!req.session) {
     return res.status(401).send({ message: 'You shall not pass!' });
+  } else {
+    next();
   }
-  next();
 }
 
 /*

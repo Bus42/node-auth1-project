@@ -33,7 +33,7 @@ const { restricted } = require('../auth/auth-middleware');
 router.get('/', restricted, (req, res) => {
   users.find()
     .then(users => {
-      console.log(users);
+      users.map(user => delete user.password)
       res.status(200).send(users);
     })
     .catch(error => {
