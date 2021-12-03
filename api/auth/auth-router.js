@@ -12,9 +12,17 @@ router.post('/register', checkUsernameFree, checkPasswordLength, (req, res) => {
     .catch(error => res.status(500).json(error));
 });
 
-router.post('/login', checkUsernameExists, (req, res) => {
-  Users.login(req.body)
-    .then(response => res.status(200).send(response))
+router.post('/login', checkUsernameExists, (req, res, next) => {
+  const { password } = req.body;
+  if (bcrypt.compareSync(password, req.user.password)) {
+    req.session.user = req.user
+    res.status(200).send(`Welcome ${req.user.username}`);
+  } else {
+    next({
+      status: 401,
+      message: 'Invalid credentials'
+    });
+  }
 })
 
 router.post('/logout', (req, res) => {

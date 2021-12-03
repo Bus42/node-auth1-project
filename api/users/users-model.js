@@ -18,8 +18,8 @@ async function find() {
   }
 }
 
-async function findBy(filter) {
-  return db('users').where(filter).select('user_id', 'username');
+async function findBy(filter) {// only used internally, so I can safely pass password
+  return db('users').where(filter);
 }
 
 async function findById(user_id) {

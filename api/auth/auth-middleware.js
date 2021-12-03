@@ -32,6 +32,7 @@ async function checkUsernameExists(req, res, next) {
   try {
     const users = await Users.findBy({ username: req.body.username });
     if (users.length) {
+      req.user = users[0];
       next();
     }
     else {
