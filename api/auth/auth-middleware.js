@@ -30,7 +30,7 @@ async function checkUsernameExists(req, res, next) {
       next();
     }
     else {
-      next({ message: 'Username does not exist', status: 401 });
+      next({ message: 'Invalid credentials', status: 401 });
     }
   }
   catch (err) {
