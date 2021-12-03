@@ -1,28 +1,27 @@
 // Require the `restricted` middleware from `auth-middleware.js`. You will need it here!
+const users = require('./users-model');
+const router = require('express').Router();
+const { isValidID } = require('./users-middleware');
+const { restricted } = require('../auth/auth-middleware');
 
+router.get('/', restricted, (req, res) => {
+  users.find()
+    .then(users => res.status(200).send(users))
+    .catch(error => {
+      res.status(500).send({ error, message: 'Failed to get users' });
+    });
+});
 
-/**
-  [GET] /api/users
-
-  This endpoint is RESTRICTED: only authenticated clients
-  should have access.
-
-  response:
-  status 200
-  [
-    {
-      "user_id": 1,
-      "username": "bob"
-    },
-    // etc
-  ]
-
-  response on non-authenticated:
-  status 401
-  {
-    "message": "You shall not pass!"
-  }
- */
-
+router.get('/:id', isValidID, (req, res) => {
+  users.findById(req.params.id)
+    .then(user => {
+      res.status(200).send(user);
+    })
+    .catch(error => {
+      res.status(500).send({ error, message: 'Failed to get user' });
+    });
+});
 
 // Don't forget to add the router to the `exports` object so it can be required in other modules
+
+module.exports = router;

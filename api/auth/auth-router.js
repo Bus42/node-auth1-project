@@ -1,63 +1,59 @@
-// Require `checkUsernameFree`, `checkUsernameExists` and `checkPasswordLength`
-// middleware functions from `auth-middleware.js`. You will need them here!
+require('dotenv').config();
+const express = require('express');
+const router = express.Router();
+const Users = require('../users/users-model');
+const { checkUsernameFree, checkPasswordLength, checkUsernameExists } = require('../auth/auth-middleware');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
+router.post('/register', checkUsernameFree, checkPasswordLength, (req, res) => {
+  const { username, password } = req.body;
+  const hash = bcrypt.hashSync(password, 10);
+  Users.add({ username, password: hash })
+    .then(saved => res.status(201).send(saved))
+    .catch(error => res.status(500).json(error));
+});
 
-/**
-  1 [POST] /api/auth/register { "username": "sue", "password": "1234" }
+router.post('/login', checkUsernameExists, (req, res, next) => {
+  const { password } = req.body;
+  if (bcrypt.compareSync(password, req.user.password)) {
+    const token = generateToken(req.user);
+    req.session.user = req.user
+    res.status(200).send({ message: `Welcome ${req.user.username}`, token });
+  } else {
+    next({
+      status: 401,
+      message: 'invalid credentials'
+    });
+  }
+})
 
-  response:
-  status 200
-  {
-    "user_id": 2,
-    "username": "sue"
+router.get('/logout', (req, res, next) => {
+  if (req.session.user) {
+    req.session.destroy(err => {
+      if (err) {
+        next(err)
+      } else {
+        next({ message: 'Logged out', status: 200 })
+      }
+    });
+  } else {
+    next({ message: 'No session', status: 401 })
+  }
+})
+
+function generateToken(user) {
+  const payload = {
+    subject: user.user_id,
+    username: user.username
+  }
+  const secret = process.env.JWT_SECRET;
+  const options = {
+    expiresIn: '1h'
   }
 
-  response on username taken:
-  status 422
-  {
-    "message": "Username taken"
-  }
+  return jwt.sign(payload, secret, options)
 
-  response on password three chars or less:
-  status 422
-  {
-    "message": "Password must be longer than 3 chars"
-  }
- */
+}
 
-
-/**
-  2 [POST] /api/auth/login { "username": "sue", "password": "1234" }
-
-  response:
-  status 200
-  {
-    "message": "Welcome sue!"
-  }
-
-  response on invalid credentials:
-  status 401
-  {
-    "message": "Invalid credentials"
-  }
- */
-
-
-/**
-  3 [GET] /api/auth/logout
-
-  response for logged-in users:
-  status 200
-  {
-    "message": "logged out"
-  }
-
-  response for not-logged-in users:
-  status 200
-  {
-    "message": "no session"
-  }
- */
-
- 
-// Don't forget to add the router to the `exports` object so it can be required in other modules
+module.exports = router;

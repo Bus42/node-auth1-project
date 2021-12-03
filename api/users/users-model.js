@@ -1,29 +1,43 @@
-/**
-  resolves to an ARRAY with all users, each user having { user_id, username }
- */
-function find() {
+const db = require('../../data/db-config');
 
+async function add(user) {
+  const [user_id] = await db('users').insert(user);
+  return findById(user_id);
 }
 
-/**
-  resolves to an ARRAY with all users that match the filter condition
- */
-function findBy(filter) {
-
+async function login(user) {
+  return `${user.username} has logged in`;
 }
 
-/**
-  resolves to the user { user_id, username } with the given user_id
- */
-function findById(user_id) {
-
+async function find() {
+  try {
+    const users = await db('users').select('user_id', 'username');
+    return users;
+  } catch (error) {
+    return ({ ...error, message: "error in users-model.js -> find" });
+  }
 }
 
-/**
-  resolves to the newly inserted user { user_id, username }
- */
-function add(user) {
-
+async function findBy(filter) {// only used internally, so I can safely pass password
+  return db('users').where(filter);
 }
 
-// Don't forget to add these to the `exports` object so they can be required in other modules
+async function findById(user_id) {
+  return db('users')
+    .where('user_id', user_id)
+    .select('user_id', 'username')
+    .first();
+}
+
+async function logout(user) {
+  return `${user.username} has logged out`;
+}
+
+module.exports = {
+  find,
+  findBy,
+  findById,
+  add,
+  login,
+  logout,
+};
