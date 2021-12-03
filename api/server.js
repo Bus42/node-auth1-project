@@ -21,7 +21,7 @@ const middleware = [
 server.use(session({
   name: "chocolatechip",
   secret: process.env.SESSION_SECRET || "NO SECRET",
-  saveUninitialized: process.env.NODE_ENV !== "production",
+  saveUninitialized: false,
   resave: false,
   store: new Store({
     knex,

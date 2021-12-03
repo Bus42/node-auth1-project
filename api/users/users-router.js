@@ -6,10 +6,7 @@ const { restricted } = require('../auth/auth-middleware');
 
 router.get('/', restricted, (req, res) => {
   users.find()
-    .then(users => {
-      users.map(user => delete user.password)
-      res.status(200).send(users);
-    })
+    .then(users => res.status(200).send(users))
     .catch(error => {
       res.status(500).send({ error, message: 'Failed to get users' });
     });

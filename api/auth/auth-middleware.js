@@ -1,17 +1,11 @@
-const colors = require('colors');
 const Users = require('../users/users-model.js');
 
 function restricted(req, res, next) {
-  if (!req.session) { console.log(colors.bgYellow.black('no session')) }
-  else {
-    console.log(colors.bgBlue.white('session:'), req.session.user);
+  if (req.session.user) {
+    next();
+  } else {
+    res.status(401).send({ message: 'You shall not pass!' });
   }
-  next();
-  // if (!req.session) {
-  //   return res.status(401).send({ message: 'You shall not pass!' });
-  // } else {
-  //   next();
-  // }
 }
 
 async function checkUsernameFree(req, res, next) {

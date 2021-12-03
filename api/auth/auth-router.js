@@ -25,10 +25,18 @@ router.post('/login', checkUsernameExists, (req, res, next) => {
   }
 })
 
-router.post('/logout', (req, res) => {
-  Users.logout(req.body)
-    .then(user => res.status(200).send(user))
-    .catch(error => res.status(422).json({ message: error.message }));
+router.get('/logout', (req, res, next) => {
+  if (req.session.user) {
+    req.session.destroy(err => {
+      if (err) {
+        next(err)
+      } else {
+        next({ message: 'Logged out', status: 200 })
+      }
+    });
+  } else {
+    next({ message: 'No session', status: 401 })
+  }
 })
 
 module.exports = router;
